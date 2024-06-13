@@ -34,15 +34,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
-import com.example.happylauncher.BaseViewModel
+import com.example.happylauncher.base.BaseViewModel
 import com.example.happylauncher.R
+import com.example.happylauncher.ui.composecomponents.ProgressIndicator
+import kotlinx.coroutines.flow.SharedFlow
 
 
 @Composable
 fun AllAppsScreen(
-    viewModel: AllAppsViewModel = hiltViewModel()
+    viewModel: AllAppsViewModel = hiltViewModel(),
+    showError: (SharedFlow<Int>) -> Unit
 ) {
     val state by viewModel.viewState.collectAsState()
+
+    showError.invoke(viewModel.errorMessage)
 
     AllAppsScreenState({
         state
@@ -88,7 +93,7 @@ fun AllAppsScreenState(
         }
 
         is BaseViewModel.ScreenState.Loading -> {
-
+            ProgressIndicator()
         }
 
         is BaseViewModel.ScreenState.Error -> {

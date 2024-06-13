@@ -5,7 +5,8 @@ import android.content.pm.LauncherApps
 import android.content.pm.PackageManager
 import android.os.UserHandle
 import android.os.UserManager
-import com.example.happylauncher.BaseViewModel
+import com.example.happylauncher.base.BaseViewModel
+import com.example.happylauncher.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -25,6 +26,7 @@ class AllAppsViewModel @Inject constructor(
     }
 
     private fun getAppsList() {
+        _viewState.update { ScreenState.Loading }
         baseViewModelScope.launch {
             for (profile in userManager.userProfiles) {
                 for (app in launcherApps.getActivityList(null, profile)) {
@@ -50,12 +52,16 @@ class AllAppsViewModel @Inject constructor(
 
     fun launchApp(packageName: String, userHandle: UserHandle) {
         val activityInfo = launcherApps.getActivityList(packageName, userHandle)
-        launcherApps.startMainActivity(
-            ComponentName(packageName, activityInfo.first().name),
-            userHandle,
-            null,
-            null
-        )
+        try {
+            launcherApps.startMainActivity(
+                ComponentName(packageName, activityInfo.first().name),
+                userHandle,
+                null,
+                null
+            )
+        } catch (e: Exception) {
+            showError(R.string.launch_app_error)
+        }
     }
 
     private fun getIcon(packageName: String) = packageManager.getApplicationIcon(packageName)

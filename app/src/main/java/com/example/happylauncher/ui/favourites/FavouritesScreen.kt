@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.happylauncher.BaseViewModel
+import com.example.happylauncher.base.BaseViewModel
 import com.example.happylauncher.R
 
 
@@ -28,7 +28,7 @@ fun FavouritesScreen(
 
 @Composable
 fun FavouritesScreenState(
-    state: () -> BaseViewModel.ScreenState,
+    state: () -> BaseViewModel.ScreenState
 ) {
     when (val stateValue = state()) {
         is BaseViewModel.ScreenState.Success<*> -> {

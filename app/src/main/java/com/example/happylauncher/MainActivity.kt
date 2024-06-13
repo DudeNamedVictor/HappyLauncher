@@ -1,5 +1,7 @@
 package com.example.happylauncher
 
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -23,14 +25,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
+import com.example.happylauncher.ui.BroadcastsRepository
 import com.example.happylauncher.ui.allapps.AllAppsScreen
+import com.example.happylauncher.ui.broadcastReceivers.BatteryInfoReceiver
+import com.example.happylauncher.ui.broadcastReceivers.DateReceiver
 import com.example.happylauncher.ui.favourites.FavouritesScreen
 import com.example.happylauncher.ui.theme.HappyLauncherTheme
+import com.example.happylauncher.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private val dateReceiver: DateReceiver by lazy { DateReceiver() }
+    private val batteryInfoReceiver: BatteryInfoReceiver by lazy { BatteryInfoReceiver() }
 
     @ExperimentalFoundationApi
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,7 +64,13 @@ class MainActivity : ComponentActivity() {
                                 }
 
                                 MENU_SCREEN -> {
-                                    AllAppsScreen()
+                                    AllAppsScreen{ message ->
+                                        lifecycleScope.launch {
+                                            message.collect { message ->
+                                                showToast(resources.getString(message))
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -62,6 +78,27 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        BroadcastsRepository.addDataSource(dateReceiver.formatDate)
+        BroadcastsRepository.addBatterySource(batteryInfoReceiver.batteryPercents)
+        registerReceiver(dateReceiver, IntentFilter(IntentFilter().apply {
+            addAction(Intent.ACTION_TIME_TICK)
+            addAction(Intent.ACTION_TIME_CHANGED)
+            addAction(Intent.ACTION_TIMEZONE_CHANGED)
+            addAction(Intent.ACTION_TIME_CHANGED)
+        }))
+        registerReceiver(batteryInfoReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+    }
+
+    override fun onPause() {
+        super.onPause()
+        batteryInfoReceiver.clearScope()
+        dateReceiver.clearScope()
+        unregisterReceiver(dateReceiver)
+        unregisterReceiver(batteryInfoReceiver)
     }
 
     companion object {
