@@ -1,9 +1,14 @@
 package com.example.happylauncher.ui.settings
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,19 +40,30 @@ fun SettingsScreen(
 ) {
     val state by viewModel.viewState.collectAsState()
 
-    SettingsScreenState({ state }, { viewModel.updateTransparent(it) })
+    SettingsScreenState(
+        { state },
+        { viewModel.updateWallpaper(it) },
+        { viewModel.updateTransparent(it) }
+    )
 }
 
 @Composable
 fun SettingsScreenState(
     state: () -> BaseViewModel.ScreenState,
+    onChangeWallpaper: (Uri) -> Unit,
     onSliderChanged: (Float) -> Unit
 ) {
     when (val stateValue = state()) {
         is BaseViewModel.ScreenState.Success<*> -> {
             val screen = (stateValue.viewState as SettingsScreenState)
-            BackgroundSettingsWidget(screen.backgroundSettingsWidget.transparentStep) {
-                onSliderChanged.invoke(it)
+            Column {
+                BackgroundSettingsWidget(screen.backgroundSettingsWidget.transparentStep) { step ->
+                    onSliderChanged.invoke(step)
+                }
+                WallpaperWidget { uri ->
+                    onChangeWallpaper.invoke(uri)
+                }
+                Spacer(modifier = Modifier.weight(1f))
             }
         }
 
@@ -68,7 +84,7 @@ fun BackgroundSettingsWidget(
 ) {
     Box(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .padding(16.dp)
     ) {
         var sliderPosition by remember { mutableFloatStateOf(transparent) }
@@ -107,6 +123,75 @@ fun BackgroundSettingsWidget(
                 text = sliderPosition.roundToInt().toString(),
                 color = Color.White,
                 textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Composable
+fun WallpaperWidget(
+    onChangeWallpaper: (Uri) -> Unit
+) {
+    val galleryLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetMultipleContents()) { uri ->
+            if (uri.isNotEmpty()) {
+                onChangeWallpaper.invoke(uri.last())
+            }
+        }
+    Column(
+        modifier = Modifier
+            .padding(horizontal = 24.dp)
+            .border(
+                width = 2.dp,
+                color = Color.White,
+                shape = RoundedCornerShape(16.dp)
+            )
+    ) {
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = stringResource(id = R.string.choose_wallpaper),
+            color = Color.White,
+            textAlign = TextAlign.Center,
+            fontSize = 16.sp
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth(0.5f)
+                    .padding(8.dp)
+                    .clickable {
+                        galleryLauncher.launch("image/*")
+                    }
+                    .border(
+                        width = 1.dp,
+                        color = Color.White,
+                        shape = RoundedCornerShape(16.dp)
+                    ),
+                text = stringResource(id = R.string.from_gallery),
+                color = Color.White,
+                textAlign = TextAlign.Center,
+                fontSize = 16.sp
+            )
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+                    .clickable {
+
+                    }
+                    .border(
+                        width = 1.dp,
+                        color = Color.White,
+                        shape = RoundedCornerShape(16.dp)
+                    ),
+                text = stringResource(id = R.string.fill_color),
+                color = Color.White,
+                textAlign = TextAlign.Center,
+                fontSize = 16.sp
             )
         }
     }

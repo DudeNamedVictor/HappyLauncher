@@ -4,4 +4,7 @@
     <string name="launch_app_error">Can not open application</string>
     <string name="swipe_to_open_menu">Swipe to open menu</string>
     <string name="background_transparent">Set background transparent</string>
+    <string name="choose_wallpaper">Choose wallpaper</string>
+    <string name="from_gallery">From gallery</string>
+    <string name="fill_color">Fill color</string>
 </resources>

@@ -1,5 +1,7 @@
 package com.example.happylauncher.di
 
+import android.app.WallpaperManager
+import android.content.ContentResolver
 import android.content.Context
 import android.content.pm.LauncherApps
 import android.content.pm.PackageManager
@@ -56,4 +58,14 @@ object AppModule {
             produceFile = { context.preferencesDataStoreFile(SETTINGS_STORE_NAME) }
         )
     }
+
+    @Singleton
+    @Provides
+    fun provideWallpaperManager(@ApplicationContext context: Context): WallpaperManager =
+        WallpaperManager.getInstance(context)
+
+    @Singleton
+    @Provides
+    fun provideContentResolver(@ApplicationContext context: Context): ContentResolver =
+        context.contentResolver
 }
