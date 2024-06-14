@@ -5,6 +5,7 @@ import android.content.IntentFilter
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
@@ -21,16 +23,21 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.lifecycleScope
 import com.example.happylauncher.ui.BroadcastsRepository
 import com.example.happylauncher.ui.allapps.AllAppsScreen
 import com.example.happylauncher.ui.broadcastReceivers.BatteryInfoReceiver
 import com.example.happylauncher.ui.broadcastReceivers.DateReceiver
 import com.example.happylauncher.ui.favourites.FavouritesScreen
+import com.example.happylauncher.ui.settings.SettingsScreen
 import com.example.happylauncher.ui.theme.HappyLauncherTheme
 import com.example.happylauncher.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -45,11 +52,18 @@ class MainActivity : ComponentActivity() {
     @ExperimentalFoundationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContent {
+            val viewModel: MainViewModel = hiltViewModel()
+            val backgroundTransparentStep by viewModel.backgroundTransparentStep.collectAsState()
+
             HappyLauncherTheme {
-                val pagerState = rememberPagerState { 2 }
+                val pagerState = rememberPagerState { 3 }
                 Scaffold(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .navigationBarsPadding()
+                        .fillMaxSize(),
+                    containerColor = colorResource(id = backgroundTransparentStep),
                     bottomBar = { MainScreenIndicator(pagerState) }) { innerPadding ->
                     Column(
                         Modifier.padding(innerPadding)
@@ -71,6 +85,9 @@ class MainActivity : ComponentActivity() {
                                             }
                                         }
                                     }
+                                }
+                                SETTINGS_SCREEN -> {
+                                    SettingsScreen()
                                 }
                             }
                         }
@@ -104,6 +121,7 @@ class MainActivity : ComponentActivity() {
     companion object {
         private const val MAIN_SCREEN = 0
         private const val MENU_SCREEN = 1
+        private const val SETTINGS_SCREEN = 2
     }
 }
 

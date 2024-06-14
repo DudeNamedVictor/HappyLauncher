@@ -5,6 +5,12 @@ import android.content.pm.LauncherApps
 import android.content.pm.PackageManager
 import android.os.BatteryManager
 import android.os.UserManager
+import androidx.datastore.core.DataStore
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.preferencesDataStoreFile
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,6 +22,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 @Module
 object AppModule {
+    private const val SETTINGS_STORE_NAME = "settings_data_store"
 
     @Singleton
     @Provides
@@ -39,4 +46,14 @@ object AppModule {
             BatteryManager.BATTERY_PROPERTY_CAPACITY
         )
 
+    @Singleton
+    @Provides
+    fun provideSettingsDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
+        return PreferenceDataStoreFactory.create(
+            corruptionHandler = ReplaceFileCorruptionHandler(
+                produceNewData = { emptyPreferences() }
+            ),
+            produceFile = { context.preferencesDataStoreFile(SETTINGS_STORE_NAME) }
+        )
+    }
 }

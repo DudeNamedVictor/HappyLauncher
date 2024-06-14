@@ -19,6 +19,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -27,15 +28,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
-import com.example.happylauncher.base.BaseViewModel
 import com.example.happylauncher.R
+import com.example.happylauncher.base.BaseViewModel
 import com.example.happylauncher.ui.composecomponents.ProgressIndicator
 import kotlinx.coroutines.flow.SharedFlow
 
@@ -108,7 +112,9 @@ fun AppsList(
     onAppClick: (String, UserHandle) -> Unit
 ) {
     LazyColumn(
-        Modifier.fillMaxWidth()
+        Modifier
+            .fillMaxWidth()
+            .padding(vertical = 16.dp)
     ) {
         items(apps) { app ->
             Row(
@@ -122,7 +128,7 @@ fun AppsList(
                     }
             ) {
                 Card(
-                    modifier = Modifier.size(36.dp),
+                    modifier = Modifier.size(48.dp),
                     shape = CircleShape
                 ) {
                     Image(
@@ -137,7 +143,9 @@ fun AppsList(
                         .padding(start = 12.dp)
                         .fillMaxWidth()
                         .align(Alignment.CenterVertically),
-                    text = app.appLabel
+                    text = app.appLabel,
+                    color = colorResource(id = R.color.white),
+                    fontSize = 20.sp
                 )
             }
         }
@@ -151,11 +159,17 @@ fun CommonTextFiled(
     onClearClicked: () -> Unit
 ) {
     OutlinedTextField(
-        value = text,
-        onValueChange = onValueChange,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp),
+            .padding(horizontal = 16.dp),
+        value = text,
+        onValueChange = onValueChange,
+        colors = TextFieldDefaults.colors(
+            unfocusedContainerColor = Color.Transparent,
+            focusedContainerColor = Color.Transparent,
+            focusedIndicatorColor = Color.White,
+            unfocusedIndicatorColor = Color.White
+        ),
         label = {
             Text(
                 stringResource(
