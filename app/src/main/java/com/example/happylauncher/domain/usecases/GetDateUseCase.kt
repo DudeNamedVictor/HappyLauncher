@@ -1,10 +1,10 @@
 package com.example.happylauncher.domain.usecases
 
-import com.example.happylauncher.common.utils.DateUtils
+import com.example.happylauncher.data.repositories.BroadcastsRepository
 
 
 class GetDateUseCase {
 
-    fun invoke() = DateUtils.getDate()
+    fun invoke() = BroadcastsRepository.formatDate
 
 }

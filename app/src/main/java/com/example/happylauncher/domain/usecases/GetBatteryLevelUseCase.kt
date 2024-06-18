@@ -1,12 +1,10 @@
 package com.example.happylauncher.domain.usecases
 
-import javax.inject.Inject
+import com.example.happylauncher.data.repositories.BroadcastsRepository
 
 
-class GetBatteryLevelUseCase @Inject constructor(
-    private val batteryLevel: Int
-) {
+class GetBatteryLevelUseCase {
 
-    fun invoke() = batteryLevel
+    fun invoke() = BroadcastsRepository.batteryPercents
 
 }
