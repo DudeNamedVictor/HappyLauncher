@@ -83,6 +83,9 @@ dependencies {
 
     // dataStore
     implementation(libs.androidx.datastore.preferences)
+
+    // colorPicker
+    implementation(libs.colorpicker.compose)
 }
 
 kapt {
